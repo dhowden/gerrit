@@ -1,4 +1,6 @@
-// Package stream provides tools for using Gerrit event streams from.
+// Package stream provides tools for using Gerrit event streams.
+// See https://gerrit-review.googlesource.com/Documentation/cmd-stream-events.html for
+// for futher details.
 package stream
 
 import (
