@@ -61,11 +61,12 @@ type AccountInfo struct {
 
 // CommentInfo contains information about a comment.
 type CommentInfo struct {
-	ID              string    `json:"id"`
-	Updated         Timestamp `json:"timestamp"`
-	PatchSet        int       `json:"patch_set"`
-	ChangeMessageID string    `json:"change_message_id"`
-	InReplyTo       string    `json:"in_reply_to"`
-	Message         string    `json:"message"`
-	Unresolved      bool      `json:"unresolved"`
+	ID              string      `json:"id"`
+	Updated         Timestamp   `json:"timestamp"`
+	PatchSet        int         `json:"patch_set"`
+	ChangeMessageID string      `json:"change_message_id"`
+	Author          AccountInfo `json:"author"`
+	InReplyTo       string      `json:"in_reply_to"`
+	Message         string      `json:"message"`
+	Unresolved      bool        `json:"unresolved"`
 }
