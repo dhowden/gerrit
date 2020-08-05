@@ -231,7 +231,9 @@ func UnmarshalEvent(b []byte) (*Event, error) {
 		y = &VoteDeleted{}
 
 	default:
-		y = &UnknownEventType{}
+		y = &UnknownEventType{
+			UnknownType: x.Type,
+		}
 	}
 
 	if err := json.Unmarshal(b, y); err != nil {

@@ -1,5 +1,7 @@
 package stream
 
+import "encoding/json"
+
 type UnknownEventType struct {
 	UnknownType string
 
@@ -8,6 +10,15 @@ type UnknownEventType struct {
 
 // Type of the event.
 func (u UnknownEventType) Type() string { return u.UnknownType }
+
+func (u *UnknownEventType) UnmarshalJSON(b []byte) error {
+	var x map[string]interface{}
+	if err := json.Unmarshal(b, &x); err != nil {
+		return err
+	}
+	u.Data = x
+	return nil
+}
 
 type AssigneeChanged struct {
 	Change      Change  `json:"change,omitempty"` // Change associated with the event.
