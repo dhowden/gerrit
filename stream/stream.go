@@ -169,9 +169,6 @@ type RefUpdate struct {
 // UnmarshalEvent unmarshals a JSON-encoded Gerrit event.
 func UnmarshalEvent(b []byte) (*Event, error) {
 	x := struct {
-		Project struct {
-			Name string
-		}
 		Type           string
 		EventCreatedOn UnixTime
 	}{}
@@ -242,7 +239,6 @@ func UnmarshalEvent(b []byte) (*Event, error) {
 	}
 
 	return &Event{
-		Project:        x.Project.Name,
 		EventType:      y,
 		EventCreatedOn: x.EventCreatedOn,
 	}, nil
@@ -254,7 +250,6 @@ func UnmarshalEvent(b []byte) (*Event, error) {
 type Event struct {
 	EventType
 
-	Project        string
 	EventCreatedOn UnixTime `json:"eventCreatedOn"`
 }
 
