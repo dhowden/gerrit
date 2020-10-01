@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/dhowden/gerrit"
 )
@@ -12,6 +13,13 @@ import (
 type Summary struct {
 	ChangeID string
 	Project  string
+	Branch   string
+
+	Subject string
+
+	Created   time.Time
+	Updated   time.Time
+	Submitted time.Time
 
 	Comments           int
 	UnresolvedComments int
@@ -21,6 +29,8 @@ type Summary struct {
 
 // Thread of comments.
 type Thread struct {
+	s *Summary
+
 	Path     string
 	Line     int
 	PatchSet int
@@ -30,11 +40,15 @@ type Thread struct {
 	LastComment gerrit.CommentInfo
 }
 
+func (t *Thread) URL() string {
+	return fmt.Sprintf("/c/%s/+/%s/%d/%v#%d", t.s.Project, t.s.ChangeID, t.PatchSet, t.Path, t.Line)
+}
+
 // Summarise the comment threads into unresolved items.
 func Summarise(ctx context.Context, gc *gerrit.Client, changeID string) (*Summary, error) {
 	gcc := &gerrit.ChangesClient{Client: gc}
 
-	ch, err := gcc.GetChange(ctx, changeID)
+	ch, err := gcc.GetChange(ctx, changeID, "TRACKING_IDS")
 	if err != nil {
 		return nil, fmt.Errorf("could not get change: %w", err)
 	}
@@ -96,9 +110,22 @@ func Summarise(ctx context.Context, gc *gerrit.Client, changeID string) (*Summar
 		authors[k] = as
 	}
 
-	ts := make([]Thread, 0, len(ucs))
+	s := &Summary{
+		ChangeID:           changeID,
+		Project:            ch.Project,
+		Branch:             ch.Branch,
+		Subject:            ch.Subject,
+		Created:            ch.Created.Time(),
+		Updated:            ch.Updated.Time(),
+		Submitted:          ch.Submitted.Time(),
+		Comments:           ch.TotalCommentCount,
+		UnresolvedComments: ch.UnresolvedCommentCount,
+		Threads:            make([]Thread, 0, len(ucs)),
+	}
+
 	for _, uc := range ucs {
-		ts = append(ts, Thread{
+		s.Threads = append(s.Threads, Thread{
+			s:           s,
 			Path:        uc.Path,
 			Line:        uc.Line,
 			PatchSet:    uc.PatchSet,
@@ -107,11 +134,5 @@ func Summarise(ctx context.Context, gc *gerrit.Client, changeID string) (*Summar
 			LastComment: uc,
 		})
 	}
-	return &Summary{
-		ChangeID:           changeID,
-		Project:            ch.Project,
-		Comments:           ch.TotalCommentCount,
-		UnresolvedComments: ch.UnresolvedCommentCount,
-		Threads:            ts,
-	}, nil
+	return s, nil
 }

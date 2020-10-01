@@ -9,12 +9,19 @@ import (
 // ChangeInfo contains information about a change.
 // https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-info
 type ChangeInfo struct {
-	Project                string
-	ID                     string
-	UnresolvedCommentCount int              `json:"unresolved_comment_count"`
-	TotalCommentCount      int              `json:"total_comment_count"`
-	TrackingIDs            []TrackingIDInfo `json:"tracking_ids"`
-	Messages               []ChangeMessageInfo
+	Project                string              `json:"project"`
+	ID                     string              `json:"id"`
+	ChangeID               string              `json:"change_id"`
+	UnresolvedCommentCount int                 `json:"unresolved_comment_count"`
+	TotalCommentCount      int                 `json:"total_comment_count"`
+	TrackingIDs            []TrackingIDInfo    `json:"tracking_ids"`
+	Messages               []ChangeMessageInfo `json:"messages"`
+	Subject                string              `json:"subject"`
+	Branch                 string              `json:"branch"`
+	Created                Timestamp           `json:"created"`
+	Updated                Timestamp           `json:"updated"`
+	Submitted              Timestamp           `json:"submitted"`
+	Owner                  AccountInfo         `json:"owner"`
 }
 
 // ChangeMessageInfo contains information about a message attached to a change.
@@ -85,9 +92,10 @@ type AccountInfo struct {
 }
 
 // CommentInfo contains information about a comment.
+// https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#comment-info
 type CommentInfo struct {
 	ID              string       `json:"id"`
-	Updated         Timestamp    `json:"timestamp"`
+	Updated         Timestamp    `json:"updated"`
 	PatchSet        int          `json:"patch_set"`
 	Path            string       `json:"path"`
 	Line            int          `json:"line"`
