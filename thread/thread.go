@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/dhowden/gerrit"
@@ -111,7 +112,7 @@ func Summarise(ctx context.Context, gc *gerrit.Client, changeID string) (*Summar
 	}
 
 	s := &Summary{
-		ChangeID:           changeID,
+		ChangeID:           strconv.Itoa(ch.Number),
 		Project:            ch.Project,
 		Branch:             ch.Branch,
 		Subject:            ch.Subject,

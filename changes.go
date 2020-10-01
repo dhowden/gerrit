@@ -22,6 +22,7 @@ type ChangeInfo struct {
 	Updated                Timestamp           `json:"updated"`
 	Submitted              Timestamp           `json:"submitted"`
 	Owner                  AccountInfo         `json:"owner"`
+	Number                 int                 `json:"_number"`
 }
 
 // ChangeMessageInfo contains information about a message attached to a change.
