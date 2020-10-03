@@ -107,7 +107,7 @@ type Change struct {
 	DependsOn       Dependency   `json:"dependsOn,omitempty"`
 	NeededBy        Dependency   `json:"neededBy,omitempty"`
 	SubmitRecords   SubmitRecord
-	AllReviewers    []Account
+	AllReviewers    []Account `json:"allReviewers,omitempty"`
 }
 
 // SubmitRecord describes the submit status of a change.
