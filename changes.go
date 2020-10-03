@@ -9,28 +9,47 @@ import (
 // ChangeInfo contains information about a change.
 // https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-info
 type ChangeInfo struct {
-	Project                string              `json:"project"`
-	ID                     string              `json:"id"`
-	ChangeID               string              `json:"change_id"`
-	UnresolvedCommentCount int                 `json:"unresolved_comment_count"`
-	TotalCommentCount      int                 `json:"total_comment_count"`
-	TrackingIDs            []TrackingIDInfo    `json:"tracking_ids"`
-	Messages               []ChangeMessageInfo `json:"messages"`
-	Subject                string              `json:"subject"`
-	Branch                 string              `json:"branch"`
-	Created                Timestamp           `json:"created"`
-	Updated                Timestamp           `json:"updated"`
-	Submitted              Timestamp           `json:"submitted"`
-	Owner                  AccountInfo         `json:"owner"`
-	Number                 int                 `json:"_number"`
+	Project                string                   `json:"project"`
+	ID                     string                   `json:"id"`
+	ChangeID               string                   `json:"change_id"`
+	UnresolvedCommentCount int                      `json:"unresolved_comment_count"`
+	TotalCommentCount      int                      `json:"total_comment_count"`
+	TrackingIDs            []TrackingIDInfo         `json:"tracking_ids"`
+	Messages               []ChangeMessageInfo      `json:"messages"`
+	Subject                string                   `json:"subject"`
+	Branch                 string                   `json:"branch"`
+	Created                Timestamp                `json:"created"`
+	Updated                Timestamp                `json:"updated"`
+	Submitted              Timestamp                `json:"submitted"`
+	Owner                  AccountInfo              `json:"owner"`
+	Number                 int                      `json:"_number"`
+	Reviewers              map[string][]AccountInfo `json:"reviewers"`
+	Revisions              map[string]RevisionInfo  `json:"revisions"`
+}
+
+// RevisionInfo contains information about a revision.
+// https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#revision-info
+type RevisionInfo struct {
+	Number   int `json:"_number"`
+	Commit   CommitInfo
+	Created  Timestamp
+	Uploader AccountInfo
+}
+
+// CommitInfo contains information about a commit.
+// https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#commit-info
+type CommitInfo struct {
+	Parents []CommitInfo
+	Subject string
+	Message string
 }
 
 // ChangeMessageInfo contains information about a message attached to a change.
 // https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-message-info
 type ChangeMessageInfo struct {
-	ID             string      // The ID of the message.
-	Author         AccountInfo // Author of the message as an AccountInfo entity.
-	RealAuthor     AccountInfo
+	ID             string       // The ID of the message.
+	Author         *AccountInfo // Author of the message as an AccountInfo entity.
+	RealAuthor     *AccountInfo
 	Date           Timestamp
 	Message        string
 	RevisionNumber int `json:"_revision_number,omitempty"` // Which patchset (if any) generated this message.
