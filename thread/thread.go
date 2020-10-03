@@ -18,6 +18,11 @@ type Summary struct {
 
 	Subject string
 
+	LatestCommitMessage string
+	AllReviewers        []gerrit.AccountInfo
+	ActiveReviewers     []gerrit.AccountInfo
+	CCed                []gerrit.AccountInfo
+
 	Created   time.Time
 	Updated   time.Time
 	Submitted time.Time
@@ -49,13 +54,48 @@ func (t *Thread) URL() string {
 func Summarise(ctx context.Context, gc *gerrit.Client, changeID string) (*Summary, error) {
 	gcc := &gerrit.ChangesClient{Client: gc}
 
-	ch, err := gcc.GetChange(ctx, changeID, "TRACKING_IDS")
+	ch, err := gcc.GetChange(ctx, changeID, "MESSAGES", "DETAILED_LABELS", "CURRENT_REVISION", "CURRENT_COMMIT", "DETAILED_ACCOUNTS")
 	if err != nil {
 		return nil, fmt.Errorf("could not get change: %w", err)
 	}
 
+	// Extract commit message
+	commitMessage := ""
+	if len(ch.Revisions) == 1 {
+		for _, x := range ch.Revisions {
+			commitMessage = x.Commit.Message
+		}
+	}
+
+	reviewers := ch.Reviewers["REVIEWER"]
+	cced := ch.Reviewers["CC"]
+
+	var activeReviewers []gerrit.AccountInfo
+	activeReviewersDedup := make(map[string]bool)
+	for _, m := range ch.Messages {
+		if activeReviewersDedup[m.Author.Username] {
+			continue
+		}
+		activeReviewers = append(activeReviewers, *m.Author)
+		activeReviewersDedup[m.Author.Username] = true
+	}
+
 	if ch.UnresolvedCommentCount == 0 {
-		return &Summary{Comments: ch.TotalCommentCount}, nil
+		return &Summary{
+			ChangeID:            strconv.Itoa(ch.Number),
+			Project:             ch.Project,
+			Branch:              ch.Branch,
+			Subject:             ch.Subject,
+			LatestCommitMessage: commitMessage,
+			Created:             ch.Created.Time(),
+			Updated:             ch.Updated.Time(),
+			Submitted:           ch.Submitted.Time(),
+			Comments:            ch.TotalCommentCount,
+			UnresolvedComments:  ch.UnresolvedCommentCount,
+			AllReviewers:        reviewers,
+			ActiveReviewers:     activeReviewers,
+			CCed:                cced,
+		}, nil
 	}
 
 	comments, err := gcc.ListChangeComments(ctx, changeID)
@@ -112,16 +152,20 @@ func Summarise(ctx context.Context, gc *gerrit.Client, changeID string) (*Summar
 	}
 
 	s := &Summary{
-		ChangeID:           strconv.Itoa(ch.Number),
-		Project:            ch.Project,
-		Branch:             ch.Branch,
-		Subject:            ch.Subject,
-		Created:            ch.Created.Time(),
-		Updated:            ch.Updated.Time(),
-		Submitted:          ch.Submitted.Time(),
-		Comments:           ch.TotalCommentCount,
-		UnresolvedComments: ch.UnresolvedCommentCount,
-		Threads:            make([]Thread, 0, len(ucs)),
+		ChangeID:            strconv.Itoa(ch.Number),
+		Project:             ch.Project,
+		Branch:              ch.Branch,
+		Subject:             ch.Subject,
+		LatestCommitMessage: commitMessage,
+		Created:             ch.Created.Time(),
+		Updated:             ch.Updated.Time(),
+		Submitted:           ch.Submitted.Time(),
+		Comments:            ch.TotalCommentCount,
+		UnresolvedComments:  ch.UnresolvedCommentCount,
+		AllReviewers:        reviewers,
+		ActiveReviewers:     activeReviewers,
+		CCed:                cced,
+		Threads:             make([]Thread, 0, len(ucs)),
 	}
 
 	for _, uc := range ucs {
