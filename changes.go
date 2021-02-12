@@ -9,22 +9,23 @@ import (
 // ChangeInfo contains information about a change.
 // https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-info
 type ChangeInfo struct {
-	Project                string                   `json:"project"`
-	ID                     string                   `json:"id"`
-	ChangeID               string                   `json:"change_id"`
-	UnresolvedCommentCount int                      `json:"unresolved_comment_count"`
-	TotalCommentCount      int                      `json:"total_comment_count"`
-	TrackingIDs            []TrackingIDInfo         `json:"tracking_ids"`
-	Messages               []ChangeMessageInfo      `json:"messages"`
-	Subject                string                   `json:"subject"`
-	Branch                 string                   `json:"branch"`
-	Created                Timestamp                `json:"created"`
-	Updated                Timestamp                `json:"updated"`
-	Submitted              Timestamp                `json:"submitted"`
-	Owner                  AccountInfo              `json:"owner"`
-	Number                 int                      `json:"_number"`
-	Reviewers              map[string][]AccountInfo `json:"reviewers"`
-	Revisions              map[string]RevisionInfo  `json:"revisions"`
+	Project                string                      `json:"project"`
+	ID                     string                      `json:"id"`
+	ChangeID               string                      `json:"change_id"`
+	UnresolvedCommentCount int                         `json:"unresolved_comment_count"`
+	TotalCommentCount      int                         `json:"total_comment_count"`
+	TrackingIDs            []TrackingIDInfo            `json:"tracking_ids"`
+	Messages               []ChangeMessageInfo         `json:"messages"`
+	Subject                string                      `json:"subject"`
+	Branch                 string                      `json:"branch"`
+	Created                Timestamp                   `json:"created"`
+	Updated                Timestamp                   `json:"updated"`
+	Submitted              Timestamp                   `json:"submitted"`
+	Owner                  AccountInfo                 `json:"owner"`
+	Number                 int                         `json:"_number"`
+	Reviewers              map[string][]AccountInfo    `json:"reviewers"`
+	Revisions              map[string]RevisionInfo     `json:"revisions"`
+	AttentionSet           map[string]AttentionSetInfo `json:"attention_set"`
 }
 
 // RevisionInfo contains information about a revision.
