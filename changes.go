@@ -26,6 +26,7 @@ type ChangeInfo struct {
 	Reviewers              map[string][]AccountInfo    `json:"reviewers"`
 	Revisions              map[string]RevisionInfo     `json:"revisions"`
 	AttentionSet           map[string]AttentionSetInfo `json:"attention_set"`
+	Submittable            bool                        `json:"submittable"` // Only set if requested via SUBMITTABLE option.
 }
 
 // RevisionInfo contains information about a revision.
